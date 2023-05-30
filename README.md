@@ -20,4 +20,4 @@ This repo contains two streamlit apps for exploring the latent space of ResNet-1
 - Nearest neighbours from the RGZ-DR1 dataset will be returned with `.csv` available for download. 
 - The script for this app is contained in `main_simsearch`.
 
-![](https://github.com/inigoval/rgz-latentexplorer/latent_space_explorer.gif)
+![](latent_space_explorer.gif)
