@@ -2,8 +2,9 @@ This repo contains two streamlit apps for exploring the latent space of ResNet-1
 
 # Instructions for use
 - Clone this repo.
-- Create a new venv for python 3.6+ and install packages from `requirements.txt`.
+- Create a new venv for python 3.6+. 
 - Activate your virtual environment.
+- Install packages by running `pip install -r requirements.txt` (make sure you are in the root of the project).
 - Download the files from [this link](https://www.dropbox.com/scl/fo/bts47gvt1pzir282b2tux/h?dl=0&rlkey=l716x8cgklnqqamlnv8yyjo2c) and place in the root folder of this project.
 - Use the command `streamlit run main_explorelatent.py` or `streamlit run main_simsearch.py` to run the desired app.
 
