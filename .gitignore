@@ -133,7 +133,7 @@ embedded_rgz.parquet
 rgz_umap_.parquet
 reducer.joblib
 
-*.png
+latent_space.png
 *.ckpt
 *.ipynb
 
