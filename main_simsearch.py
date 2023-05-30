@@ -42,18 +42,6 @@ def main():
     tree = fit_tree(df)
 
     with col1:
-        n_images = st.slider(
-            label="Number of images to show", min_value=4, max_value=20, value=12, step=4
-        )
-
-        duplicate_threshold = st.slider(
-            label="Threshold for removing duplicates (arcsec)",
-            min_value=0,
-            max_value=200,
-            value=30,
-            step=1,
-        )
-
         ra = st.number_input(label="RA value", format="%.6f", value=139.14801, step=0.000001)
         dec = st.number_input(label="DEC value", format="%.6f", value=4.6812873, step=0.000001)
 
@@ -68,6 +56,18 @@ def main():
             st.pyplot(fig)
         else:
             st.warning("No image available for this location or timed out")
+
+        n_images = st.slider(
+            label="Number of images to show", min_value=4, max_value=20, value=12, step=4
+        )
+
+        duplicate_threshold = st.slider(
+            label="Threshold for removing duplicates (arcsec)",
+            min_value=0,
+            max_value=200,
+            value=30,
+            step=1,
+        )
 
     with col2:
         if img is not None:
