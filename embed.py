@@ -20,12 +20,12 @@ from collections import Counter
 from sklearn.decomposition import PCA
 from umap import UMAP
 from byol.models import BYOL
-from architectures.resnet import _get_resnet
 from model import BasicBlock, ResNet
 
 from byol.paths import Path_Handler
-from byol.dataloading.datamodules.rgz import RGZ108k
+from byol.datamodules import RGZ108k
 from byol.utilities import embed_dataset
+from byol.models import BYOL
 
 
 class RGZ(RGZ108k):
@@ -113,8 +113,13 @@ d_rgz = RGZ(
 # y = {id: {"umap_x": None, "umap_y": None} for id in d_rgz.rgzid}
 
 # Load model
-model_path = paths["main"] / "analysis" / "byol.ckpt"
-checkpoint = torch.load(model_path, map_location=torch.device("cpu"))
+# model_path = "byol.ckpt"
+# checkpoint = torch.load(model_path, map_location=torch.device("cpu"))
+
+# byol = BYOL.load_from_checkpoint("byol.ckpt")
+# byol.eval()
+# encoder = byol.encoder.cuda()
+# encoder.eval()
 
 encoder = ResNet(block=BasicBlock, layers=[2, 2, 2, 2], n_c=1, downscale=True, features=512).cuda()
 encoder.load_state_dict(torch.load("encoder.pt"))
@@ -128,22 +133,35 @@ device = next(encoder.parameters()).device
 
 feat_cols = [f"feat_{i}" for i in range(512)]
 
-df = pd.DataFrame(columns=["rgz_name", "size"] + feat_cols)
+rgz_emb = []
 
 for X, idx in tqdm(DataLoader(d_rgz, batch_size=500, shuffle=False)):
-    names = d_rgz.rgzid[idx].tolist()
-    sizes = d_rgz.sizes[idx].tolist()
-
     B = X.shape[0]
 
     X_emb = encoder(X.cuda()).squeeze().detach().cpu().numpy().reshape((B, -1))
+    rgz_emb.append(X_emb)
 
-    df_tmp = pd.DataFrame(
-        data=np.concatenate([names, sizes, X_emb], axis=1),
-        columns=["rgz_name", "size"] + feat_cols,
-    )
+rgz_emb = np.concatenate(rgz_emb, axis=0)
+print(f"Embedded batch shape: {X_emb.shape}, embedded dataset shape: {rgz_emb.shape}")
 
-    df = pd.concat([df, df_tmp], axis=0)
+df = pd.DataFrame(columns=feat_cols, data=rgz_emb)
+df["rgz_name"] = d_rgz.rgzid
+df["size"] = d_rgz.sizes
+
+# for X, idx in tqdm(DataLoader(d_rgz, batch_size=500, shuffle=False)):
+#     names = d_rgz.rgzid[idx].tolist()
+#     sizes = d_rgz.sizes[idx].tolist()
+
+#     B = X.shape[0]
+
+#     X_emb = encoder(X.cuda()).squeeze().detach().cpu().numpy().reshape((B, -1))
+
+#     df_tmp = pd.DataFrame(
+#         data=np.concatenate([names, sizes, X_emb], axis=1),
+#         columns=["rgz_name", "size"] + feat_cols,
+#     )
+
+#     df = pd.concat([df, df_tmp], axis=0)
 
 # Set dtypes
 df = df.astype({feat_col: "float32" for feat_col in feat_cols})
@@ -162,4 +180,9 @@ print(df.head())
 # Save dataframe
 print("Saving dataframe...")
 df.to_parquet("embedded_rgz.parquet", index=False)
-print("Done!")
+
+
+# Plot pca to check
+# features = torch.tensor(df[feat_cols].values)
+# features_test = encoder(next(iter(DataLoader(d_rgz, batch_size=len(d_rgz), shuffle=False)))).squeeze()
+# print(torch.count_nonzero(features - features_test))

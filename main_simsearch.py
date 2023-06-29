@@ -38,7 +38,7 @@ def main():
 
     # df = load_umap()
     df = load_pca()
-    print(df.columns)
+
     tree = fit_tree(df)
 
     with col1:
