@@ -146,7 +146,7 @@ def show_latent_space_interface(df):
         x, y = ax.transData.inverted().transform([x_pix, y_pix])
 
         # Hacky solution to align mouse pointer with latent space image
-        offset = 13.48
+        offset = 12.28
 
         y = -y + offset
         return x, y
